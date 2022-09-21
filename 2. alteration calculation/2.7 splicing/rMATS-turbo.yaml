@@ -1,0 +1,51 @@
+name: rMATS-turbo
+channels:
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/bioconda
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/fastai/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/pytorch/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/bioconda/
+dependencies:
+  - _libgcc_mutex=0.1=main
+  - _openmp_mutex=5.1=1_gnu
+  - blas=1.0=openblas
+  - ca-certificates=2022.4.26=h06a4308_0
+  - certifi=2020.6.20=pyhd3eb1b0_3
+  - gsl=2.7.1=hd82f3ee_0
+  - ld_impl_linux-64=2.38=h1181459_1
+  - libblas=3.9.0=14_linux64_openblas
+  - libffi=3.2.1=hf484d3e_1007
+  - libgcc-ng=11.2.0=h1234567_0
+  - libgfortran=3.0.0=1
+  - libgfortran-ng=11.2.0=h00389a5_0
+  - libgfortran5=11.2.0=h1234567_0
+  - libgomp=11.2.0=h1234567_0
+  - liblapack=3.9.0=14_linux64_openblas
+  - libopenblas=0.3.20=h043d6bf_0
+  - libstdcxx-ng=11.2.0=h1234567_0
+  - libzlib=1.2.11=h166bdaf_1014
+  - ncurses=6.3=h7f8727e_2
+  - numpy=1.13.1=py27_nomkl_0
+  - openblas=0.2.19=0
+  - openssl=1.1.1o=h7f8727e_0
+  - pandas=0.20.3=py27_0
+  - pip=9.0.1=py27_1
+  - python=2.7.15=h5a48372_1011_cpython
+  - python-dateutil=2.8.2=pyhd3eb1b0_0
+  - python_abi=2.7=1_cp27mu
+  - pytz=2021.3=pyhd3eb1b0_0
+  - readline=8.1.2=h7f8727e_1
+  - rmats=4.1.2=py27h0a1da55_3
+  - setuptools=36.4.0=py27_1
+  - six=1.16.0=pyhd3eb1b0_1
+  - sqlite=3.38.2=hc218d9a_0
+  - star=2.7.10a=h9ee0642_0
+  - tk=8.6.11=h1ccaba5_0
+  - wheel=0.37.1=pyhd3eb1b0_0
+  - zlib=1.2.11=h166bdaf_1014
+prefix: /data/taoyuhuan/tools/miniconda3/envs/rMATS-turbo

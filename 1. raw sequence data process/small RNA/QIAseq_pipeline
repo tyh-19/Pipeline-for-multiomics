@@ -1,0 +1,150 @@
+dataset = "multiomics_qia"
+sample_ids = open("sample_id/{}.txt".format(dataset)).read().strip().split("\n")
+sequences = ["spikein_small","univec","rRNA","miRNA","lncRNA","mRNA","piRNA","snoRNA","snRNA","srpRNA","tRNA","tucpRNA","Y_RNA","genome","circRNA"]
+
+rule all:
+    input:
+        qc1 = expand("output/{dataset}/qc1/{sample_id}_fastqc.html",dataset=[dataset],sample_id = sample_ids),
+        bams = expand("output/{dataset}/mapping/{sample_id}/bam-deduped/{sequence}.bam", sample_id=sample_ids, dataset= dataset, sequence =  sequences),
+        genome_bam = expand("output/{dataset}/star-mapping/{sample_id}/Aligned.out.sorted.deduped.bam",dataset= dataset,sample_id=sample_ids),
+        counts = expand("output/{dataset}/count/{sample_id}/{sequence}.txt", sample_id=sample_ids, dataset= dataset, sequence =  sequences),
+        unmapped_rRNA = expand("output/{dataset}/mapping/{sample_id}/unmapped/rRNA.fastq.gz", dataset = dataset, sample_id = sample_ids)
+
+rule extractUMI:
+    input:
+        fastq = "data/{dataset}/{sample_id}.fastq.gz"
+    output:
+        fastq = "output/{dataset}/extract-UMI/{sample_id}.fastq.gz" 
+    log:
+        "output/{dataset}/log/extract-UMI/{sample_id}.txt" 
+    shell:
+        """
+        umi_tools extract --extract-method=regex  -p "^.+(?P<discard_1>AACTGTAGGCACCATCAAT)(?P<umi_1>.{{12}})(?P<discard_2>.+)" -I {input.fastq} --stdout={output.fastq} -L {log}
+        """
+
+rule trim:
+    input:
+        fastq = "output/{dataset}/extract-UMI/{sample_id}.fastq.gz"
+    output:
+        fastq = "output/{dataset}/trimmed/{sample_id}.fastq.gz"
+    log:
+        "output/{dataset}/log/trim/{sample_id}.txt"
+    shell:
+        """
+        trim_galore --quality 30 --length 15 --trim-n --phred33 -o output/{wildcards.dataset}/trimmed --basename {wildcards.sample_id} {input.fastq} > {log} 2>&1
+        mv output/{wildcards.dataset}/trimmed/{wildcards.sample_id}_trimmed.fq.gz {output.fastq}
+        """
+
+
+rule qc0:
+    input:
+        fastq = "data/{dataset}/{sample_id}.fastq.gz"
+    output:
+        report = "output/{dataset}/qc0/{sample_id}_fastqc.html"
+    params:
+        outdir = "output/{dataset}/qc0"
+    shell:
+        """
+        fastqc -o {params.outdir} {input.fastq}
+        """
+
+rule qc1:
+    input:
+        fastq = "output/{dataset}/trimmed/{sample_id}.fastq.gz"
+    output:
+        report = "output/{dataset}/qc1/{sample_id}_fastqc.html"
+    params:
+        outdir = "output/{dataset}/qc1"
+    shell:
+        """
+        fastqc -o {params.outdir} {input.fastq}
+        """
+
+
+
+rule mapping:
+    input:
+        fastq = "output/{dataset}/trimmed/{sample_id}.fastq.gz"
+    output:
+        bams = [ "output/{dataset}/mapping/{sample_id}/bam/" + sequence + ".bam" for sequence in sequences ],
+        output = [ "output/{dataset}/mapping/{sample_id}/unmapped/" + sequence + ".fastq.gz" for sequence in sequences ]
+    threads:
+        4
+    shell:
+        """
+        scripts/mapping.py --fastq {input.fastq} --bam-dir output/{wildcards.dataset}/mapping/{wildcards.sample_id}/bam \
+        --log-dir output/{wildcards.dataset}/log/mapping/{wildcards.sample_id} --threads {threads} \
+        --unmapped-dir output/{wildcards.dataset}/mapping/{wildcards.sample_id}/unmapped
+        """ 
+
+
+### Mapping to human genome 
+rule genome_mapping:
+    input:
+        fastq = 'output/{dataset}/mapping/{sample_id}/unmapped/rRNA.fastq.gz',
+    output:
+        bam = "output/{dataset}/star-mapping/{sample_id}/Aligned.out.bam",
+    threads: 4
+    params:
+        genome = '/data/taoyuhuan/RNAseq/reference/genome_index/star/hg38_long'
+    log: "output/{dataset}/star-mapping/{sample_id}/error.log"
+    shell:
+        """
+        STAR --genomeDir {params.genome} \
+            --readFilesIn {input.fastq}  \
+            --runThreadN {threads} \
+            --outFileNamePrefix output/{wildcards.dataset}/star-mapping/{wildcards.sample_id}/ \
+            --outSAMtype BAM Unsorted \
+            --outReadsUnmapped Fastx \
+            --readFilesCommand gzip -d -c \
+            --outSAMmultNmax 1 > {log} 2>&1
+        # gzip output/{wildcards.dataset}/star-mapping/{wildcards.sample_id}/Unmapped.out.mate1
+        """
+
+rule sort_genome_bam:
+    input:
+        bam = "output/{dataset}/star-mapping/{sample_id}/Aligned.out.bam"
+    output:
+        bam = "output/{dataset}/star-mapping/{sample_id}/Aligned.out.sorted.bam"
+    threads: 4
+    shell:
+        """
+        samtools sort --threads {threads} {input.bam} > {output.bam}
+        samtools index {output.bam}
+        """
+
+rule dedup_genome:
+    input:
+        bam = "output/{dataset}/star-mapping/{sample_id}/Aligned.out.sorted.bam"
+    output:
+        bam = "output/{dataset}/star-mapping/{sample_id}/Aligned.out.sorted.deduped.bam"
+    log:
+        "output/{dataset}/log/dedup-star/{sample_id}.log"
+    shell:
+        """
+        umi_tools dedup -I {input.bam} -S {output.bam} > {log} 2>&1
+        """
+
+
+rule dedup:
+    input:
+        bam = "output/{dataset}/mapping/{sample_id}/bam/{sequence}.bam"
+    output:
+        bam = "output/{dataset}/mapping/{sample_id}/bam-deduped/{sequence}.bam"
+    log:
+        "output/{dataset}/log/dedup/{sample_id}/{sequence}.log"
+    shell:
+        """
+        umi_tools dedup -I {input.bam} -S {output.bam} > {log}
+        """
+
+rule counts:
+    input:
+        bam = "output/{dataset}/mapping/{sample_id}/bam-deduped/{sequence}.bam"
+    output:
+        count = "output/{dataset}/count/{sample_id}/{sequence}.txt"
+    shell:
+        """
+        scripts/count_reads.py count_transcript -i {input.bam} -o {output.count}
+        """
+

@@ -1,0 +1,11 @@
+{
+	"__default__" :
+	{
+		"jobname": "{rule}-{wildcards.sample_id}",
+		"partition": "CN_BIOT",
+		"nodes": 2,
+		"ntasks": 16,
+		"output": "cluster_log/{rule}-{wildcards.sample_id}.out",
+		"error": "cluster_log/{rule}-{wildcards.sample_id}.err"
+	}
+}
