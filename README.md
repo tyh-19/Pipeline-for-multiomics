@@ -152,49 +152,59 @@ Rscript TPM.R -m raw_count_matrix.txt -n TPM -ID ensembl_gene_id -o ./output_dir
 
 2.2 alternative promoter
 
-Introduction：
+Introduction：transcript isoform abundance was quantified by *salmon* and normalized to TPM. TPMs of isoforms with transcript start sites within 10 bp (sharing the same promoter) were aggregated as one promoter activity. TPM < 1 promoter is defined as inactive promoter. Promoter with the highest relative promoter activity is defined as major promoter. The remaining promoters are defined as minor promoter
 
 Requirements：
 
 Demostration：
+
+
 
 
 
 2.3 allelic expression
 
-Introduction：
+Introduction：*GATK ASEReadCounter* were used to identify allele specific expression gene site based on SNP sites. ﻿For each individual, ﻿Allelic expression (AE, AE = |0.5 − Reference ratio |, Reference ratio = Reference reads/Total reads) was calculated for all sites with ≥16 reads
 
 Requirements：
 
 Demostration：
+
+
 
 2.4 chimeric RNA
 
-Introduction：
+Introduction：Reads unaligned to genome were remapped to chimeric junctions by *STAR-fusion* to identify chimeric RNA.
 
 Requirements：
 
 Demostration：
+
+
 
 2.5 editing
 
-Introduction：
+Introduction：*GATK ASEReadCounter* were used to identify editing sites based on REDIportal. The editing ratio was defined as allele count divided by total count.
 
 Requirements：
 
 Demostration：
+
+
 
 2.6 SNP
 
-Introduction：
+Introduction：intron-spanning reads were splited by *GATK SplitNCigarReads* for confident SNP calling at RNA level. Then, alterations were identified by *GATK HaplotypeCaller* and filtered by *GATK VariantFilteration* with the following 4 criteria: strand bias defined by fisher exact test phred-scaled p value (FS) < 20, variant confidence (QUAL) divided by the unfiltered depth (QD) > 2, total number of reads at the variant site (DP) > 10, SNP quality (QUAL) > 20. Allele fraction was defined as allele count divided by total count (reference count and allele count).
 
 Requirements：
 
 Demostration：
 
+
+
 2.7 splicing
 
-Introduction：
+Introduction：The percent spliced-in (PSI) score of each alternative splicing event was calculated using *rMATs-turbo*.
 
 Requirements：
 
