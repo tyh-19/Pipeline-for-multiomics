@@ -1,5 +1,5 @@
 # Analysis-pipeline-for-multiomics
-### 1.raw sequence data process
+### 1.Raw sequence data process
 
 **1.1 Long RNA**
 
@@ -116,7 +116,7 @@ Demostration：
 
 
 
-### 2. alteration calculation
+### 2. Alteration calculation
 
 Alteration calculation is based on middle or downstream output of **1.raw sequence data process**
 
@@ -150,82 +150,253 @@ Rscript TPM.R -m raw_count_matrix.txt -n TPM -ID ensembl_gene_id -o ./output_dir
 
 
 
-2.2 alternative promoter
+**2.2 alternative promoter**  [based on adaptor cutted sequences in **1.raw sequence data process**]
 
 Introduction：transcript isoform abundance was quantified by *salmon* and normalized to TPM. TPMs of isoforms with transcript start sites within 10 bp (sharing the same promoter) were aggregated as one promoter activity. TPM < 1 promoter is defined as inactive promoter. Promoter with the highest relative promoter activity is defined as major promoter. The remaining promoters are defined as minor promoter
 
 Requirements：
 
+```
+python=3.7.4
+R=3.6
+R packages:
+	argparse
+	dplyr
+	GenomicFeatures
+	doParallel
+	parallel
+
+salmon=1.4.0
+```
+
 Demostration：
 
+Step A. generate normalized promoter usage.
+
+Prepare adaptor cutted fastq files in ./${dataset_name}/output/cutadapt, and reference files in ${ref}.
+
+```
+sh level_3_Alt.promoter.sh ${dataset_name}
+```
+
+*Details in help of salmon, prepareTxQuantMat.py, getPromoterActivity.py, AlternativePromoter_Normalize.R*
+
+Step B. classify promoters
+
+If we need to classify promoter into inactive, minor and major promoters, we can run the following Rscript.
+
+```
+Rscript Promoter_usage.R -n ${normalized promoter usage matrix file from step A}
+```
+
+*Details in help of Promoter_usage.R*
 
 
 
+**2.3 allelic expression** [based on non-duplicated sequences mapped to genome in **1.raw sequence data process**]
 
-2.3 allelic expression
-
-Introduction：*GATK ASEReadCounter* were used to identify allele specific expression gene site based on SNP sites. ﻿For each individual, ﻿Allelic expression (AE, AE = |0.5 − Reference ratio |, Reference ratio = Reference reads/Total reads) was calculated for all sites with ≥16 reads
+Introduction：*GATK ASEReadCounter* were used to identify allele specific expression gene site based on SNP sites. ﻿For each individual, ﻿Allelic expression (AE, AE = |0.5 − Reference ratio|, Reference ratio = Reference reads/Total reads) was calculated for all sites with ≥16 reads
 
 Requirements：
 
+```
+python=3.7.4
+R=3.6
+R packages:
+	argparse
+	dplyr
+	doParallel
+
+gatk-4.1.9.0
+```
+
+
+
 Demostration：
 
+Step A. generate per-sample allelic alter count at each SNP site
+
+Prepare non-duplicated sequences mapped to genome by 2passMode in STAR in ./${dataset_name}/output/bam, and reference files in ${ref}.
+
+```
+sh level_3_Editing_SNP_ASE.sh ${dataset_name}
+```
+
+Step B. Summarize per-sample allelic count and reference count to Allelic expression matrix
+
+ ```
+Rscript ASE_AE.R -i ${output}/ASE/COSMIC -o ${output}/matrix/ASE_COSMIC_${dataset}.txt
+ ```
+
+*Details in help of ASE_AE.R*
 
 
-2.4 chimeric RNA
+
+**2.4 chimeric RNA** [based on sequences unmapped to genome in **1.raw sequence data process**]
 
 Introduction：Reads unaligned to genome were remapped to chimeric junctions by *STAR-fusion* to identify chimeric RNA.
 
 Requirements：
 
+```
+Python=3.7.0
+R=3.5.1
+R packages:
+	argparse
+	dplyr
+	doParallel
+STAR=2.5.3a_modified [2.5.3a is ok]
+STAR-Fusion=1.10.0
+```
+
+*Detailed environment please refer to ChimericRNA.yaml*
+
+
+
 Demostration：
 
+Prepare sequences unmapped to genome in ./${dataset_name}/output/unmapped, and reference files in ${ref}.
+
+```
+sh level_3_star-fusion.sh ${dataset_name}
+```
+
+*Details in help of STAR-Fusion and STARFusion_matrix.R*
 
 
-2.5 editing
+
+**2.5 editing** [based on non-duplicated sequences mapped to genome in **1.raw sequence data process**]
 
 Introduction：*GATK ASEReadCounter* were used to identify editing sites based on REDIportal. The editing ratio was defined as allele count divided by total count.
 
 Requirements：
 
+```
+python=3.7.4
+R=3.6
+R packages:
+	argparse
+	dplyr
+	doParallel
+
+gatk-4.1.9.0
+```
+
+
+
 Demostration：
 
+Step A. generate per-sample allelic alter count at each RNA editing site
+
+Prepare non-duplicated sequences mapped to genome by 2passMode in STAR in ./${dataset_name}/output/bam, and reference files in ${ref}.
+
+```
+sh level_3_Editing_SNP_ASE.sh ${dataset_name}
+```
+
+Step B. Summarize per-sample allelic count and reference count to RNA editing site matrix
+
+ ```
+Rscript Editing_ratio.R -i ${output}/REDIportal -o ${output}/matrix/Editing_ratio.txt
+ ```
+
+*Details in help of Editing_ratio.R*
 
 
-2.6 SNP
+
+**2.6 SNP** [based on non-duplicated sequences mapped to genome in **1.raw sequence data process**]
 
 Introduction：intron-spanning reads were splited by *GATK SplitNCigarReads* for confident SNP calling at RNA level. Then, alterations were identified by *GATK HaplotypeCaller* and filtered by *GATK VariantFilteration* with the following 4 criteria: strand bias defined by fisher exact test phred-scaled p value (FS) < 20, variant confidence (QUAL) divided by the unfiltered depth (QD) > 2, total number of reads at the variant site (DP) > 10, SNP quality (QUAL) > 20. Allele fraction was defined as allele count divided by total count (reference count and allele count).
 
 Requirements：
 
+```
+python=3.7.4
+R=3.6
+R packages:
+	argparse
+	dplyr
+	doParallel
+
+gatk-4.1.9.0
+ensembl-vep=104.3
+```
+
+
+
 Demostration：
 
+Step A. generate per-sample allelic alter count at each RNA editing site
+
+Prepare non-duplicated sequences mapped to genome by 2passMode in STAR in ./${dataset_name}/output/bam, and reference files in ${ref}.
+
+```
+sh level_3_Editing_SNP_ASE.sh ${dataset_name}
+```
+
+Step B. summarize per-sample allelic count and reference count to RNA editing site matrix
+
+ ```
+Rscript SNP_AF.R -i ${output}/SNP -o ${output}/matrix
+ ```
+
+*Details in help of SNP_AF.R*
+
+Step C. annotate SNPs by VEP
+
+```
+#Firstly filter low quality SNP in Step.B
+sh vcf_filter.sh ${dataset_name}
+
+#Then annotate high qualilty SNP by VEP
+sh VEP.sh ${dataset_name}
+
+#mutation classification can be summaried
+Summary_mutation_class_forplot.R  -i ${directory with VEP annotated files} -o ${output}
+```
+
+*Details in help of VEP, SNP_AF.R and Summaru_mutation_class_forplot.R*
 
 
-2.7 splicing
+
+**2.7 splicing** [based on non-duplicated sequences mapped to genome in **1.raw sequence data process**]
 
 Introduction：The percent spliced-in (PSI) score of each alternative splicing event was calculated using *rMATs-turbo*.
 
 Requirements：
 
+```
+python=2.7.12
+R=3.6
+rmats=4.1.2
+```
+
 Demostration：
 
+Prepare positive and negative group of sample identifers and their full path to non-duplicated sequences mapped to genome by 2passMode in STAR.
+
+```
+sh level3_splicing.sh ${dataset_name} ${positive} ${negative}
+```
+
+*Details in help of rmats.py*
 
 
-3. detailed analysis
 
-   3.1 differential analysis
+### 3. Detailed analysis
 
-   3.2 gini index
+3.1 differential analysis
 
-   3.3 PCA analysis and distance calculation
+3.2 gini index
 
-   3.4 Cancer outlier detection
+3.3 PCA analysis and distance calculation
 
-   3.5 functional enrichment analysis
+3.4 Cancer outlier detection
 
-   3.6 multiomics integrative pathway enrichment
+3.5 functional enrichment analysis
 
-   3.7 Cell type abundance estimation
+3.6 multiomics integrative pathway enrichment
 
-   3.8 Correlation analysis
+3.7 Cell type abundance estimation
+
+3.8 Correlation analysis
