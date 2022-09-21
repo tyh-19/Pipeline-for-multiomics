@@ -3,7 +3,7 @@
 
    **1.1 Long RNA**
 
-   **Introduction：**This pipeline is designed for SMARTer-seq pico input v2, which utilizing template switch strategy to add adaptor sequence at 5' of RNA fragments. This strategy introduces ~3 GC pairs at the 5' end of read. We trimmed these artificial GC pairs to allow more precise read assignment. We also applied sequential mapping strategy, sequentially mapped to ERCC spike-in, univec, rRNA, genome and circular RNA. Sequential mapping strategy can reduce chances of multi-mapping, result in higher mapping ratio.
+   **Introduction:** This pipeline is designed for SMARTer-seq pico input v2, which utilizing template switch strategy to add adaptor sequence at 5' of RNA fragments. This strategy introduces ~3 GC pairs at the 5' end of read. We trimmed these artificial GC pairs to allow more precise read assignment. We also applied sequential mapping strategy, sequentially mapped to ERCC spike-in, univec, rRNA, genome and circular RNA. Sequential mapping strategy can reduce chances of multi-mapping, result in higher mapping ratio.
 
    **Requirements：**
 
