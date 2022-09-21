@@ -5,7 +5,7 @@ suppressPackageStartupMessages(library(data.table))
 suppressPackageStartupMessages(library(dplyr))
 
 
-parser <- ArgumentParser(description='Random Forest LOO')
+parser <- ArgumentParser(description='Mutation classification summary')
 parser$add_argument('-i', '--input_dir', type='character', required=TRUE,
     help='input directory, which contains VEP annoted SNP files(end with .VEP.txt)')
 parser$add_argument('-o', '--output_dir', type='character', required=TRUE,
