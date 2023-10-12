@@ -94,12 +94,12 @@ snakemake --snakefile small_pipeline
 
 **Requirements**
 
-- smk: snakemake/DIP-seq-pe.snakemake
-- cfg: config/test.yaml
+- smk: ./1.raw sequence data process/DIP-seq/snakemake/DIP-seq-pe.snakemake
+- cfg: ./1.raw sequence data process/DIP-seq/config/test.yaml
 - env:
-  - snakemake/envs/DIP.yml
-  - snakemake/envs/py27.yml
-  - snakemake/envs/r35.yml
+  - ./1.raw sequence data process/DIP-seq/snakemake/envs/DIP.yml
+  - ./1.raw sequence data process/DIP-seq/snakemake/envs/py27.yml
+  - ./1.raw sequence data process/DIP-seq/snakemake/envs/r35.yml
 
 **Demostration：**
 ```
@@ -117,13 +117,13 @@ snakemake --rerun-incomplete --keep-going --printshellcmds --reason \
 **Requirements**
 
 - smk:
-  - snakemake/DNA-seq-common.snakemake
-  - snakemake/DNA-seq-pe.snakemake
-- cfg: config/test.yaml
+  - ./1.raw sequence data process/DNA-seq/snakemake/DNA-seq-common.snakemake
+  - ./1.raw sequence data process/DNA-seq/snakemake/DNA-seq-pe.snakemake
+- cfg: ./1.raw sequence data process/DNA-seq/config/test.yaml
 - env:
-  - snakemake/envs/DNA.yml
-    - DIP-seq/snakemake/envs/py27.yml
-    - DIP-seq/snakemake/envs/r35.yml
+  - ./1.raw sequence data process/DNA-seq/snakemake/envs/DNA.yml
+    - ./1.raw sequence data process/DIP-seq/snakemake/envs/py27.yml
+    - ./1.raw sequence data process/DIP-seq/snakemake/envs/r35.yml
 
 **Demostration：**
 
@@ -404,17 +404,17 @@ sh level3_splicing.sh ${dataset_name} ${positive} ${negative}
 
 **2.8 methylation level**
 
-included within snakemake/DIP-seq-pe.snakemake (rule: count_matrix_gene)
+included within ./1.raw sequence data process/DIP-seq/snakemake/DIP-seq-pe.snakemake (rule: count_matrix_gene)
 
 **2.9 cfDNA WGS CNV**
 
 Requirements：
 
-- smk: snakemake/DNA-seq-pe-CNV.snakemake
-- cfg: config/test.yaml
+- smk: ./1.raw sequence data process/DNA-seq/snakemake/DNA-seq-pe-CNV.snakemake
+- cfg: ./1.raw sequence data process/DNA-seq/config/test.yaml
 - env:
-  - snakemake/envs/DNA_CNV_WisecondorX.yml
-  - snakemake/envs/DNA_CNV_CNVkit.yml
+  - ./1.raw sequence data process/DNA-seq/snakemake/envs/DNA_CNV_WisecondorX.yml
+  - ./1.raw sequence data process/DNA-seq/snakemake/envs/DNA_CNV_CNVkit.yml
 
 Demonstration：
 included within pre-process (snakemake/DNA-seq-pe-CNV.snakemake)
@@ -424,14 +424,14 @@ included within pre-process (snakemake/DNA-seq-pe-CNV.snakemake)
 
 Requirements：
 
-- smk: snakemake/DNA-seq-pe-FragSize.snakemake
-- cfg: config/test.yaml
+- smk: ./1.raw sequence data process/DNA-seq/snakemake/DNA-seq-pe-FragSize.snakemake
+- cfg: ./1.raw sequence data process/DNA-seq/config/test.yaml
 - env:
-  - snakemake/envs/DNA_FragSize.yml
+  - ./1.raw sequence data process/DNA-seq/snakemake/envs/DNA_FragSize.yml
 
 Demonstration：
 
-included within pre-process (snakemake/DNA-seq-pe-FragSize.snakemake)
+included within pre-process (./1.raw sequence data process/DNA-seq/snakemake/DNA-seq-pe-FragSize.snakemake)
 
 
 **2.11 cfDNA WGS WPS**
@@ -440,28 +440,14 @@ included within pre-process (snakemake/DNA-seq-pe-FragSize.snakemake)
 
 Requirements：
 
-- smk: snakemake/WPS/snakefile_WPS.smk
-- cfg: snakemake/WPS/config/config.yml
-- env: snakemake/WPS/workflow/envs/cfDNA.yml
+- smk: ./1.raw sequence data process/DNA-seq/snakemake/WPS/snakefile_WPS.smk
+- cfg: ./1.raw sequence data process/DNA-seq/snakemake/WPS/config/config.yml
+- env: ./1.raw sequence data process/DNA-seq/snakemake/WPS/workflow/envs/cfDNA.yml
 
 Demonstration：
 
-included within pre-process (WPS/snakefile_WPS.smk)
+included within pre-process (./1.raw sequence data process/DNA-seq/WPS/snakefile_WPS.smk)
 
 ### 3. Detailed analysis
 
-3.1 differential analysis
-
-3.2 gini index
-
-3.3 PCA analysis and distance calculation
-
-3.4 Cancer outlier detection
-
-3.5 functional enrichment analysis
-
-3.6 multiomics integrative pathway enrichment
-
-3.7 Cell type abundance estimation
-
-3.8 Correlation analysis
+Documented in ./3.detailed analysis/Multiomics_final.R
