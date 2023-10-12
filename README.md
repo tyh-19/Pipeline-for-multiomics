@@ -90,30 +90,52 @@ snakemake --snakefile small_pipeline
 
 *More details on configuration settings or advanced usage in high-performance cluster, please refer to ./1. raw sequence data process/small RNA/README.md*
 
+**1.3 cfDNA Methylation/cfMeDIP (DIP-seq)**
 
+**Requirements**
 
-**1.3 DNA**
+- smk: snakemake/DIP-seq-pe.snakemake
+- cfg: config/test.yaml
+- env:
+  - snakemake/envs/DIP.yml
+  - snakemake/envs/py27.yml
+  - snakemake/envs/r35.yml
 
-Introduction：
+**Demostration：**
+```
+dst="test"
+snakemake --rerun-incomplete --keep-going --printshellcmds --reason \
+  --use-conda --nolock --latency-wait 200 --restart-times 1 --jobs 16 \
+  --snakefile snakemake/DIP-seq-pe.snakemake \
+  --configfile config/${dst}.yaml \
 
-Requirements：
+  > run-${dst}_methylation.log 2>&1
+```
 
-Demostration：
+**1.4 cfDNA WGS (DNA-seq)**
 
+**Requirements**
 
+- smk:
+  - snakemake/DNA-seq-common.snakemake
+  - snakemake/DNA-seq-pe.snakemake
+- cfg: config/test.yaml
+- env:
+  - snakemake/envs/DNA.yml
+    - DIP-seq/snakemake/envs/py27.yml
+    - DIP-seq/snakemake/envs/r35.yml
 
-**1.4 DNA methylation**
+**Demostration：**
 
-Introduction：
+```
+dst="test"
+snakemake --rerun-incomplete --keep-going --printshellcmds --reason \
+  --use-conda --nolock --latency-wait 200 --restart-times 1 --jobs 16 \
+  --snakefile snakemake/DNA-seq-pe.snakemake \
+  --configfile config/${dst}.yaml \
 
-Requirements：
-
-Demostration：
-
-
-
------
-
+  > run-${dst}_WGS.log 2>&1
+```
 
 
 ### 2. Alteration calculation
@@ -138,7 +160,7 @@ R packages:
 	EnsDb.Hsapiens.v86
 ```
 
-Demostration：
+Demonstration：
 
 Before normalized abundance, raw count matrix should be prepare in the form of tab seperated file. Row is  gene identifiers and colum is sample identifiers. The following Rscript support 2 normalization method: TPM and CPM. The gene identifiers can be ensembl_gene_id, hgnc_symbol, external_gene_name and gene_names in EnsDb.Hsapiens.v86.
 
@@ -169,7 +191,7 @@ R packages:
 salmon=1.4.0
 ```
 
-Demostration：
+Demonstration：
 
 Step A. generate normalized promoter usage.
 
@@ -212,7 +234,7 @@ gatk-4.1.9.0
 
 
 
-Demostration：
+Demonstration：
 
 Step A. generate per-sample allelic alter count at each SNP site
 
@@ -252,8 +274,7 @@ STAR-Fusion=1.10.0
 *Detailed environment please refer to ChimericRNA.yaml*
 
 
-
-Demostration：
+Demonstration：
 
 Prepare sequences unmapped to genome in ./${dataset_name}/output/unmapped, and reference files in ${ref}.
 
@@ -324,7 +345,7 @@ ensembl-vep=104.3
 
 
 
-Demostration：
+Demonstration：
 
 Step A. generate per-sample allelic alter count at each RNA editing site
 
@@ -371,7 +392,7 @@ R=3.6
 rmats=4.1.2
 ```
 
-Demostration：
+Demonstration：
 
 Prepare positive and negative group of sample identifers and their full path to non-duplicated sequences mapped to genome by 2passMode in STAR.
 
@@ -381,7 +402,51 @@ sh level3_splicing.sh ${dataset_name} ${positive} ${negative}
 
 *Details in help of rmats.py*
 
+**2.8 methylation level**
 
+included within snakemake/DIP-seq-pe.snakemake (rule: count_matrix_gene)
+
+**2.9 cfDNA WGS CNV**
+
+Requirements：
+
+- smk: snakemake/DNA-seq-pe-CNV.snakemake
+- cfg: config/test.yaml
+- env:
+  - snakemake/envs/DNA_CNV_WisecondorX.yml
+  - snakemake/envs/DNA_CNV_CNVkit.yml
+
+Demonstration：
+included within pre-process (snakemake/DNA-seq-pe-CNV.snakemake)
+
+
+**2.10 cfDNA WGS FragSize**
+
+Requirements：
+
+- smk: snakemake/DNA-seq-pe-FragSize.snakemake
+- cfg: config/test.yaml
+- env:
+  - snakemake/envs/DNA_FragSize.yml
+
+Demonstration：
+
+included within pre-process (snakemake/DNA-seq-pe-FragSize.snakemake)
+
+
+**2.11 cfDNA WGS WPS**
+
+(modified from https://github.com/kircherlab/cfDNA)
+
+Requirements：
+
+- smk: snakemake/WPS/snakefile_WPS.smk
+- cfg: snakemake/WPS/config/config.yml
+- env: snakemake/WPS/workflow/envs/cfDNA.yml
+
+Demonstration：
+
+included within pre-process (WPS/snakefile_WPS.smk)
 
 ### 3. Detailed analysis
 
