@@ -1,0 +1,29 @@
+{
+    "__default__" :
+    {
+        "jobname": "{rule}-{wildcards.sample_id}",
+        "threads": "{threads}",
+        "partition" : "CN_BIOT",
+        "output": "log/{dataset}/{rule}-{wildcards.sample_id}.out",
+        "error": "log/{dataset}/{rule}-{wildcards.sample_id}.err"
+    },
+
+    "summary_qc" :
+    {
+        "jobname": "{rule}",
+        "threads": "{threads}",
+        "partition" : "CN_BIOT",
+        "output": "log/{dataset}/{rule}.out",
+        "error": "log/{dataset}/{rule}.err"     
+    },
+   
+    "combine_matrix" :
+    {
+        "jobname": "{rule}",
+        "threads": "12",
+        "partition" : "CN_BIOT",
+        "output": "log/{dataset}/{rule}.out",
+        "error": "log/{dataset}/{rule}.err"             
+    }
+
+}   

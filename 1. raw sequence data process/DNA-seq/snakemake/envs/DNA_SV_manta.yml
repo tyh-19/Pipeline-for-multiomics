@@ -1,0 +1,12 @@
+name: DNA_SV_manta 
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - https://conda.anaconda.org/IBMDecisionOptimization/linux-64
+  - http://conda.anaconda.org/dranew
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free
+dependencies:
+  - python
+  - manta=1.6.0
